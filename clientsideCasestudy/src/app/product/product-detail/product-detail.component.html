@@ -1,0 +1,133 @@
+<form [formGroup]="productForm">
+
+    <!-- Panel 1: Non-Inventory Product Information -->
+    <mat-accordion>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header class="my-primary-text">
+                <mat-panel-title>Product Information</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div layout="row" *ngIf="!selectedProduct.id; else displayidro">
+                <mat-form-field flex>
+                    <mat-label>Product Id</mat-label>
+                    <input matInput type="text" formControlName="id" />
+                    <mat-error align="end">
+                        <span *ngIf="id.hasError('required')">Product Id is required</span>
+                        <span *ngIf="!id.hasError('required') && id.hasError('idExists')">Product Id already
+                            exists</span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <ng-template #displayidro>
+                <mat-form-field flex style="font-weight: bolder" color="accent">
+                    <mat-label>Product ID</mat-label>
+                    <input matInput [readonly]="true" formControlName="id" />
+                </mat-form-field>
+                <br />
+            </ng-template>
+            <div layout="row">
+                <mat-form-field flex>
+                    <mat-label>Vendor</mat-label>
+                    <mat-select formControlName="vendorid">
+                        <mat-option *ngFor="let vendor of vendors" [value]="vendor.id">
+                            {{ vendor.name }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="vendorid.errors && (vendorid.dirty || vendorid.touched)" align="end">
+                        Vendor is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div layout="row">
+                <mat-form-field flex>
+                    <mat-label>Product Name</mat-label>
+                    <input matInput type="text" formControlName="name" />
+                    <mat-error *ngIf="name.errors && (name.dirty || name.touched)" align="end">
+                        Product Name is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div layout="row">
+                <mat-form-field>
+                    <mat-label>Cost Price</mat-label>
+                    <input matInput type="number" formControlName="costprice" />
+                    <mat-error *ngIf="costprice.errors && (costprice.dirty || costprice.touched)" align="end">
+                        Cost Price is required and should be lower than MSRP
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>MSRP</mat-label>
+                    <input matInput type="number" formControlName="msrp" />
+                    <mat-error *ngIf="msrp.errors && (msrp.dirty || msrp.touched)" align="end">
+                        MSRP is required and should be lower than Cost Price
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+
+        <!-- Panel 2: Inventory Product Information -->
+        <mat-expansion-panel>
+            <mat-expansion-panel-header class="my-primary-text">
+                <mat-panel-title>Inventory Information</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div layout="row">
+                <mat-form-field>
+                    <mat-label>Reorder Point (ROP)</mat-label>
+                    <input matInput type="number" formControlName="rop" />
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Economic Order Quantity (EOQ)</mat-label>
+                    <input matInput type="number" formControlName="eoq" />
+                </mat-form-field>
+            </div>
+            <div layout="row">
+                <mat-form-field>
+                    <mat-label>Quantity on Hand (QOH)</mat-label>
+                    <input matInput type="number" formControlName="qoh" />
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Quantity on Order (QOO)</mat-label>
+                    <input matInput type="number" formControlName="qoo" />
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header class="my-primary-text">
+                <mat-panel-title>
+                    QRCode Information
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div layout="row">
+                <mat-form-field flex>
+                    <mat-label>QR Code Text</mat-label>
+                    <input matInput type="text" formControlName="qrcodetxt" />
+
+                </mat-form-field>
+            </div>
+            <div *ngIf="selectedProduct.qrcode" style="padding-top: 1em; margin-left: 1em">
+                QR Code:
+                <img style="display: block" [src]="'data:image/png;base64,' + selectedProduct.qrcode" />
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <!-- Buttons and Closing Markup -->
+    <div class="mat-pad-sm">
+        <span>
+            <button mat-raised-button [disabled]="!productForm.valid" type="button" (click)="updateSelectedProduct()">
+                Save
+            </button>
+        </span>
+        <span>
+            <button *ngIf="selectedProduct.id" mat-raised-button type="button" (click)="openDeleteDialog(selectedProduct)">
+                Delete
+            </button>
+        </span>
+        <span>
+            <button mat-raised-button type="button" (click)="cancelled.emit(selectedProduct)">
+                Cancel
+            </button>
+        </span>
+    </div>
+</form>
